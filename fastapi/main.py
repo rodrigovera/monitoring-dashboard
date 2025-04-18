@@ -6,6 +6,8 @@ import psutil
 from datetime import datetime, timezone
 from prometheus_fastapi_instrumentator import Instrumentator
 from database import create_clients_table, get_db_connection
+from pydantic import BaseModel
+from database import insert_client
 
 app = FastAPI()
 
@@ -80,3 +82,21 @@ def startup():
     os.makedirs("/app/logs/", exist_ok=True)
     create_clients_table()
 
+class ClienteRegistro(BaseModel):
+    nombre: str
+    email: str
+    api_url: str
+    token: str | None = None
+
+@app.post("/clientes/register")
+def registrar_cliente(cliente: ClienteRegistro):
+    try:
+        insert_client(
+            nombre=cliente.nombre,
+            email=cliente.email,
+            api_url=cliente.api_url,
+            token=cliente.token
+        )
+        return {"message": "Cliente registrado exitosamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al registrar cliente: {e}")
