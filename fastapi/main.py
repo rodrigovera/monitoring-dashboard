@@ -5,6 +5,7 @@ import json
 import psutil
 from datetime import datetime, timezone
 from prometheus_fastapi_instrumentator import Instrumentator
+from database import create_clients_table, get_db_connection
 
 app = FastAPI()
 
@@ -73,3 +74,9 @@ def cause_error(request: Request):
     error = HTTPException(status_code=500, detail="Este es un error simulado para pruebas de logging")
     log_json_error(request, error)
     raise error
+
+@app.on_event("startup")
+def startup():
+    os.makedirs("/app/logs/", exist_ok=True)
+    create_clients_table()
+
