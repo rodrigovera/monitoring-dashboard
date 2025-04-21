@@ -1,8 +1,11 @@
 # database.py
-
+import os
 import sqlite3
 
-DB_NAME = "monitoring.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_NAME = os.path.join(BASE_DIR, "monitoring.db")
+
+print(f"Creando/abriendo base de datos en: {DB_NAME}")  # <- esta línea nueva
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
