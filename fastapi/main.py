@@ -1,17 +1,12 @@
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
-import logging
+import os
 import json
+import logging
 import psutil
 from datetime import datetime, timezone
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
-from database import create_clients_table, get_db_connection
 from pydantic import BaseModel
-from database import insert_client
-
-#para pruebas
-from pydantic import BaseModel
-from fastapi import HTTPException##hasta aqui
 
 app = FastAPI()
 
@@ -24,6 +19,19 @@ def read_root():
     return {"message": "Bienvenido al Dashboard de Monitoreo"}
 
 # 📌 Configuración de logs en formato JSON
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
+log_path = os.path.join(log_dir, 'errors.log')
+log_json_path = os.path.join(log_dir, 'errors.json')
+
+logging.basicConfig(
+    filename=log_path,
+    filemode="a",
+    level=logging.ERROR,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 def log_json_error(request: Request, error: Exception):
     log_entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -32,19 +40,11 @@ def log_json_error(request: Request, error: Exception):
         "error": str(error)
     }
     try:
-        with open("/app/logs/errors.json", "a") as log_file:
+        with open(log_json_path, "a") as log_file:
             json.dump(log_entry, log_file)
-            log_file.write("\n")  # Asegura que cada entrada sea una nueva línea
+            log_file.write("\n")
     except Exception as log_error:
         logging.error(f"❌ ERROR al escribir en errors.json: {log_error}")
-
-# 📌 Configuración de logging estándar
-logging.basicConfig(
-    filename="/app/logs/errors.log",
-    filemode="a",
-    level=logging.ERROR,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 # 📌 Middleware para capturar errores
 @app.middleware("http")
@@ -66,7 +66,7 @@ async def custom_exception_handler(request: Request, exc: Exception):
     log_json_error(request, exc)
     return JSONResponse(content={"detail": "Internal Server Error"}, status_code=500)
 
-# 📌 Endpoints
+# 📌 Endpoints de métricas y prueba de error
 @app.get("/metrics")
 def get_metrics():
     return {
@@ -81,11 +81,7 @@ def cause_error(request: Request):
     log_json_error(request, error)
     raise error
 
-@app.on_event("startup")
-def startup():
-    os.makedirs("/app/logs/", exist_ok=True)
-    create_clients_table()
-
+# 📌 Endpoint de registro de cliente (sin BD por ahora)
 class ClienteRegistro(BaseModel):
     nombre: str
     email: str
@@ -94,23 +90,5 @@ class ClienteRegistro(BaseModel):
 
 @app.post("/clientes/register")
 def registrar_cliente(cliente: ClienteRegistro):
-    try:
-        insert_client(
-            nombre=cliente.nombre,
-            email=cliente.email,
-            api_url=cliente.api_url,
-            token=cliente.token
-        )
-        return {"message": "Cliente registrado exitosamente"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al registrar cliente: {e}")
-    ##pruebitas
-class ClienteRegistro(BaseModel):
-    nombre: str
-    email: str
-    api_url: str
-    token: str | None = None
+    return {"message": f"Cliente '{cliente.nombre}' registrado exitosamente"}
 
-@app.post("/clientes/register")
-def registrar_cliente(cliente: ClienteRegistro):
-    return {"message": f"Cliente '{cliente.nombre}' registrado exitosamente"}##hasta aqui
