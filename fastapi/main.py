@@ -9,6 +9,10 @@ from database import create_clients_table, get_db_connection
 from pydantic import BaseModel
 from database import insert_client
 
+#para pruebas
+from pydantic import BaseModel
+from fastapi import HTTPException##hasta aqui
+
 app = FastAPI()
 
 # 🔹 Agregar el instrumentador de Prometheus
@@ -100,3 +104,13 @@ def registrar_cliente(cliente: ClienteRegistro):
         return {"message": "Cliente registrado exitosamente"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al registrar cliente: {e}")
+    ##pruebitas
+class ClienteRegistro(BaseModel):
+    nombre: str
+    email: str
+    api_url: str
+    token: str | None = None
+
+@app.post("/clientes/register")
+def registrar_cliente(cliente: ClienteRegistro):
+    return {"message": f"Cliente '{cliente.nombre}' registrado exitosamente"}##hasta aqui
