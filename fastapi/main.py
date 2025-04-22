@@ -7,9 +7,9 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
-
+from database import create_clients_table
 app = FastAPI()
-
+create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
 # 🔹 Agregar el instrumentador de Prometheus
 Instrumentator().instrument(app).expose(app)
 
