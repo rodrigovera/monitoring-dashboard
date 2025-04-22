@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 from database import create_clients_table, insert_client
+from database import get_db_connection
 
 app = FastAPI()
 create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
@@ -99,4 +100,22 @@ def registrar_cliente(cliente: ClienteRegistro):
     )
     return {"message": f"Cliente '{cliente.nombre}' registrado exitosamente en la base de datos"}
 
+@app.get("/clientes")
+def listar_clientes():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM clients")
+    rows = cursor.fetchall()
+    conn.close()
 
+    clientes = []
+    for row in rows:
+        clientes.append({
+            "id": row["id"],
+            "nombre": row["nombre"],
+            "email": row["email"],
+            "api_url": row["api_url"],
+            "token": row["token"],
+            "fecha_registro": row["fecha_registro"]
+        })
+    return clientes
