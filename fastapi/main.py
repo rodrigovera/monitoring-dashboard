@@ -7,7 +7,8 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
-from database import create_clients_table
+from database import create_clients_table, insert_client
+
 app = FastAPI()
 create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
 # 🔹 Agregar el instrumentador de Prometheus
@@ -81,7 +82,7 @@ def cause_error(request: Request):
     log_json_error(request, error)
     raise error
 
-# 📌 Endpoint de registro de cliente (sin BD por ahora)
+
 class ClienteRegistro(BaseModel):
     nombre: str
     email: str
@@ -90,5 +91,12 @@ class ClienteRegistro(BaseModel):
 
 @app.post("/clientes/register")
 def registrar_cliente(cliente: ClienteRegistro):
-    return {"message": f"Cliente '{cliente.nombre}' registrado exitosamente"}
+    insert_client(
+        cliente.nombre,
+        cliente.email,
+        cliente.api_url,
+        cliente.token
+    )
+    return {"message": f"Cliente '{cliente.nombre}' registrado exitosamente en la base de datos"}
+
 
