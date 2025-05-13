@@ -9,7 +9,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 from database import create_clients_table, insert_client
 from database import get_db_connection
-
+import httpx
 app = FastAPI()
 create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
 # 🔹 Agregar el instrumentador de Prometheus
@@ -119,3 +119,31 @@ def listar_clientes():
             "fecha_registro": row["fecha_registro"]
         })
     return clientes
+@app.get("/clientes/{cliente_id}/metrics")
+async def obtener_metrics_cliente(cliente_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM clients WHERE id = ?", (cliente_id,))
+    cliente = cursor.fetchone()
+    conn.close()
+
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+
+    api_url = cliente["api_url"]
+    metrics_url = f"{api_url.rstrip('/')}/metrics"
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(metrics_url)
+
+        response.raise_for_status()
+
+        # Devuelve texto o JSON según el content-type
+        if 'application/json' in response.headers.get('content-type', ''):
+            return response.json()
+        else:
+            return JSONResponse(content={"metrics": response.text})
+
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=502, detail=f"No se pudo obtener /metrics del cliente: {str(e)}")
