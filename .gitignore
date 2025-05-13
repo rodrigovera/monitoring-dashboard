@@ -1,0 +1,46 @@
+# Logs
+logs/
+*.log
+*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+env/
+venv/
+*.env
+
+# VSCode / IDEs
+.vscode/
+.idea/
+
+# Docker
+**/.dockerignore
+docker-compose.override.yml
+
+# Grafana local data
+grafana/data/
+grafana/grafana.db
+grafana/grafana.ini
+grafana/plugins/
+
+# Loki/Promtail positions
+config.yml
+position.yaml
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Backup o archivos temporales
+*~
+*.bak
+*.tmp
+*.swp
+
+
+# Base de datos SQLite (no versionarla)
+fastapi/monitoring.db
