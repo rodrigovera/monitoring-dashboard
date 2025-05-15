@@ -51,7 +51,7 @@ services:
     volumes:
       - ./logs:/logs
       - ./promtail/config.yml:/etc/promtail/config.yml
-      - ./promtail/positions.yaml:/positions.yaml
+      
     command: -config.file=/etc/promtail/config.yml
     restart: unless-stopped
     networks:
