@@ -179,7 +179,7 @@ async def obtener_logs_loki(limit: int = 10):
 
     except httpx.HTTPError as e:
         raise HTTPException(status_code=502, detail=f"Error al consultar Loki: {str(e)}")
-    @app.get("/logs")
+@app.get("/logs")
 async def obtener_logs_loki(limit: int = 10, query: str = Query("error")):
     """
     Consulta a Loki y devuelve los logs más recientes que contengan 'error'.
