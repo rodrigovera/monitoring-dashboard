@@ -149,37 +149,6 @@ async def obtener_metrics_cliente(cliente_id: int):
         raise HTTPException(status_code=502, detail=f"No se pudo obtener /metrics del cliente: {str(e)}")
 
 @app.get("/logs")
-async def obtener_logs_loki(limit: int = 10):
-    query = '{filename="/app/logs/errors.json"} |= "error"'
-    loki_url = "http://localhost:3100/loki/api/v1/query"
-
-    params = {
-        "query": query,
-        "limit": limit
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(loki_url, params=params)
-        response.raise_for_status()
-
-        data = response.json()
-
-        logs = []
-        for stream in data.get("data", {}).get("result", []):
-            for entry in stream.get("values", []):
-                timestamp_ns, log_line = entry
-                timestamp = datetime.fromtimestamp(int(timestamp_ns) / 1e9, tz=timezone.utc)
-                logs.append({
-                    "timestamp": timestamp.isoformat(),
-                    "log": log_line.strip()
-                })
-
-        return logs
-
-    except httpx.HTTPError as e:
-        raise HTTPException(status_code=502, detail=f"Error al consultar Loki: {str(e)}")
-@app.get("/logs")
 async def obtener_logs_loki(limit: int = 10, query: str = Query("error")):
     """
     Consulta a Loki y devuelve los logs más recientes que contengan 'error'.
