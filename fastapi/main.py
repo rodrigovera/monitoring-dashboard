@@ -179,3 +179,40 @@ async def obtener_logs_loki(limit: int = 10):
 
     except httpx.HTTPError as e:
         raise HTTPException(status_code=502, detail=f"Error al consultar Loki: {str(e)}")
+    @app.get("/logs")
+async def obtener_logs_loki(limit: int = 10, query: str = Query("error")):
+    """
+    Consulta a Loki y devuelve los logs más recientes que contengan 'error'.
+    Puedes personalizar el número de resultados con ?limit=.
+    """
+    loki_url = "http://localhost:3100/loki/api/v1/query"
+
+    # Consulta Loki con filtro por filename y palabra clave
+    loki_query = f'{{filename="/logs/errors.json"}} |= "{query}"'
+
+    params = {
+        "query": loki_query,
+        "limit": limit
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(loki_url, params=params)
+        response.raise_for_status()
+
+        data = response.json()
+        logs = []
+
+        for stream in data.get("data", {}).get("result", []):
+            for entry in stream.get("values", []):
+                timestamp_ns, log_line = entry
+                timestamp = datetime.fromtimestamp(int(timestamp_ns) / 1e9, tz=timezone.utc)
+                logs.append({
+                    "timestamp": timestamp.isoformat(),
+                    "log": log_line.strip()
+                })
+
+        return logs
+
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=502, detail=f"Error al consultar Loki: {str(e)}")
