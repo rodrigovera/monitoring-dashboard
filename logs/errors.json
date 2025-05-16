@@ -1,1 +1,6 @@
 {"timestamp": "2025-04-12T10:00:00", "message": "Error inicial"}
+{"timestamp": "2025-05-14T13:00:00Z", "url": "/prueba", "error": "Error de prueba"}
+{"timestamp": "2025-05-15T15:50:00Z", "url": "/test3", "error": "Nuevo error visible"}
+{"timestamp": "2025-05-15T15:50:00Z", "url": "/test3", "error": "Nuevo error visible"}
+{"timestamp": "2025-05-15T15:50:00Z", "url": "/test3", "error": "Nuevo error visible"}
+{"timestamp": "2025-05-15T18:07:38.854070+00:00", "method": "GET", "url": "http://localhost:8000/cause_error", "error": "500: Este es un error simulado para pruebas de logging"}
