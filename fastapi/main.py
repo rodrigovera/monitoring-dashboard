@@ -157,7 +157,8 @@ async def obtener_logs_loki(limit: int = 10, query: str = Query("error")):
     loki_url = "http://loki:3100/loki/api/v1/query"
 
     # Consulta Loki con filtro por filename y palabra clave
-    loki_query = f'{{filename="/logs/errors.json"}} |= "{query}"'
+    loki_query = f'{{job="errors"}} |= "{query}"'
+
 
     params = {
         "query": loki_query,
