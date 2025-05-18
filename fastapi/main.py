@@ -11,6 +11,7 @@ from database import create_clients_table, insert_client
 from database import get_db_connection
 import httpx
 from fastapi.middleware.cors import CORSMiddleware
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,7 +22,7 @@ app.add_middleware(
 )
 
 
-app = FastAPI()
+
 create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
 # 🔹 Agregar el instrumentador de Prometheus
 Instrumentator().instrument(app).expose(app)
