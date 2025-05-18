@@ -8,6 +8,7 @@ services:
       - "8000:8000"
     volumes:
       - ./logs:/app/logs
+      - ./fastapi:/app
     restart: unless-stopped
     networks:
       - monitoring
