@@ -154,7 +154,8 @@ async def obtener_logs_loki(limit: int = 10, query: str = Query("error")):
     Consulta a Loki y devuelve los logs más recientes que contengan 'error'.
     Puedes personalizar el número de resultados con ?limit=.
     """
-    loki_url = "http://loki:3100/loki/api/v1/query"
+    loki_url = "http://loki:3100/loki/api/v1/query_range"
+
 
     # Consulta Loki con filtro por filename y palabra clave
     loki_query = f'{{job="errors"}} |= "{query}"'
