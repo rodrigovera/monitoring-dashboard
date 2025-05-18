@@ -12,6 +12,8 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    depends_on:
+      - promtail
 
   prometheus:
     image: prom/prometheus
