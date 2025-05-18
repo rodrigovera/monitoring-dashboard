@@ -10,6 +10,17 @@ from pydantic import BaseModel
 from database import create_clients_table, insert_client
 from database import get_db_connection
 import httpx
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://20.127.192.215:5173"],  # o usa ["*"] durante pruebas
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 app = FastAPI()
 create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
 # 🔹 Agregar el instrumentador de Prometheus
