@@ -25,7 +25,8 @@ app.add_middleware(
 
 create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
 # 🔹 Agregar el instrumentador de Prometheus
-Instrumentator().instrument(app).expose(app)
+Instrumentator().instrument(app).expose(app, endpoint="/prometheus-metrics")
+
 
 # 📌 Endpoints de la API
 @app.get("/")
@@ -144,7 +145,7 @@ async def obtener_metrics_cliente(cliente_id: int):
 
     api_url = cliente["api_url"]
     metrics_url = f"{api_url.rstrip('/')}/metrics"
-    
+
     print(f"📡 Consultando métricas para cliente {cliente_id}")
     print(f"🔗 URL objetivo: {metrics_url}")  # 👈 Aquí lo verás en consola
 
