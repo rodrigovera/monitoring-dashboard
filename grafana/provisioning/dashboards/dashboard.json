@@ -1,6 +1,6 @@
 {
   "id": null,
-  "uid": "fastapi-dashboard",
+  "uid": "fastapi-dashboard-v2",
   "title": "Estado del sistema FastAPI",
   "tags": ["monitoring", "fastapi", "devops"],
   "timezone": "browser",
