@@ -11,6 +11,10 @@ from database import create_clients_table, insert_client
 from database import get_db_connection
 import httpx
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_client import Gauge, generate_latest, CONTENT_TYPE_LATEST
+import asyncio
+from fastapi.responses import Response
+
 app = FastAPI()
 
 app.add_middleware(
@@ -20,12 +24,57 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+# ✅ Métricas personalizadas que reflejan el estado del cliente
+cpu_gauge = Gauge("custom_cpu_percent", "CPU usage (%) of client")
+memory_gauge = Gauge("custom_memory_percent", "RAM usage (%) of client")
+disk_gauge = Gauge("custom_disk_usage_percent", "Disk usage (%) of client")
 
 
 create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
 # 🔹 Agregar el instrumentador de Prometheus
-Instrumentator().instrument(app).expose(app, endpoint="/prometheus-metrics")
+#Instrumentator().instrument(app).expose(app, endpoint="/prometheus-metrics")
+CLIENTE_ACTUAL = 3  # Cliente por defecto
+
+@app.post("/seleccionar-cliente")
+def seleccionar_cliente(cliente_id: int):
+    global CLIENTE_ACTUAL
+    CLIENTE_ACTUAL = cliente_id
+    return {"message": f"Cliente activo actualizado a {cliente_id}"}
+
+
+@app.on_event("startup")
+async def start_background_tasks():
+    asyncio.create_task(actualizar_metricas_cliente())
+
+
+async def actualizar_metricas_cliente():
+    global CLIENTE_ACTUAL
+    while True:
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT api_url FROM clients WHERE id = ?", (CLIENTE_ACTUAL,))
+            cliente = cursor.fetchone()
+            conn.close()
+
+            if cliente:
+                metrics_url = f"{cliente['api_url'].rstrip('/')}/metrics"
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    response = await client.get(metrics_url)
+                    if response.status_code == 200:
+                        data = response.json()
+                        cpu_gauge.set(data.get("cpu_percent", 0))
+                        memory_gauge.set(data.get("memory_percent", 0))
+                        disk_gauge.set(data.get("disk_usage", 0))
+                        print(f"📈 Métricas actualizadas del cliente {CLIENTE_ACTUAL}")
+        except Exception as e:
+            print(f"❌ Error actualizando métricas del cliente {CLIENTE_ACTUAL}: {e}")
+        await asyncio.sleep(10)
+
+
+@app.get("/prometheus-metrics")
+def prometheus_metrics():
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 # 📌 Endpoints de la API

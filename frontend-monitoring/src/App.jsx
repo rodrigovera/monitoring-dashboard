@@ -33,17 +33,35 @@ export default function App() {
   };
 
   const obtenerMetricas = async (id) => {
-    setError(null);
-    setMetricas({});
-    try {
-      const res = await fetch(`http://20.127.192.215:8000/clientes/${id}/metrics`);
-      if (!res.ok) throw new Error("No se pudieron obtener las métricas");
-      const data = await res.json();
-      setMetricas({ [id]: data });
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+  setError(null);
+  setMetricas({});
+  try {
+    await seleccionarCliente(id); // ✅ Cambiar el cliente activo
+    const res = await fetch(`http://20.127.192.215:8000/clientes/${id}/metrics`);
+    if (!res.ok) throw new Error("No se pudieron obtener las métricas");
+    const data = await res.json();
+    setMetricas({ [id]: data });
+  } catch (err) {
+    setError(err.message);
+  }
+};
+
+const seleccionarCliente = async (id) => {
+  try {
+    const res = await fetch("http://20.127.192.215:8000/seleccionar-cliente", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ cliente_id: id }),
+    });
+    const data = await res.json();
+    console.log("✅ Cliente seleccionado:", data.message);
+  } catch (err) {
+    console.error("❌ Error al seleccionar cliente:", err);
+  }
+};
+
 
   return (
     <div className="p-8">
@@ -63,6 +81,17 @@ export default function App() {
                 <p>🧠 CPU: {metricas[cliente.id].cpu_percent}%</p>
                 <p>💾 RAM: {metricas[cliente.id].memory_percent}%</p>
                 <p>📀 Disco: {metricas[cliente.id].disk_usage}%</p>
+                {/* 🔹 IFRAME de Grafana */}
+                <div className="mt-4">
+                  <h3 className="text-md font-semibold mb-2">Dashboard en tiempo real:</h3>
+                  <iframe
+                    src="http://20.127.192.215:3000/d/fastapi-dashboard-v2/estado-del-sistema-fastapi?orgId=1&refresh=10s"
+                    width="100%"
+                    height="400"
+                    frameBorder="0"
+                    className="rounded border"
+                  ></iframe>
+                </div>
               </div>
             )}
           </li>
