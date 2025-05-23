@@ -136,6 +136,14 @@ const seleccionarCliente = async (id) => {
       </form>
 
       {error && <p className="text-red-500 mt-4">Error: {error}</p>}
+      <iframe
+        src={`http://20.127.192.215:3000/d/fastapi-dashboard-v2/estado-del-sistema-fastapi?orgId=1&var-job=${clienteActivo.job}&refresh=10s`}
+        width="100%"
+        height="400"
+        frameBorder="0"
+        className="rounded border"
+      />
+
     </div>
   );
 }

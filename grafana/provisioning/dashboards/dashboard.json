@@ -15,7 +15,7 @@
       "gridPos": { "x": 0, "y": 0, "h": 10, "w": 24 },
       "targets": [
         {
-          "expr": "{job=\"errors\"}",
+          "expr": "{job=~\"errors|cliente-bananero\"}",
           "refId": "A",
           "datasource": "Loki"
         }
