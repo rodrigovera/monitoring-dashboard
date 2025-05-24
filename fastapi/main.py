@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Gauge, generate_latest, CONTENT_TYPE_LATEST
 import asyncio
 from fastapi.responses import Response
+import subprocess
 
 app = FastAPI()
 
@@ -24,15 +25,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # ✅ Métricas personalizadas que reflejan el estado del cliente
 cpu_gauge = Gauge("custom_cpu_percent", "CPU usage (%) of client")
 memory_gauge = Gauge("custom_memory_percent", "RAM usage (%) of client")
 disk_gauge = Gauge("custom_disk_usage_percent", "Disk usage (%) of client")
 
+create_clients_table()
 
-create_clients_table()  # <-- ¡Esta línea activa el print y crea la tabla!
-# 🔹 Agregar el instrumentador de Prometheus
-#Instrumentator().instrument(app).expose(app, endpoint="/prometheus-metrics")
 CLIENTE_ACTUAL = 3  # Cliente por defecto
 
 @app.post("/seleccionar-cliente")
@@ -41,11 +41,22 @@ def seleccionar_cliente(cliente_id: int):
     CLIENTE_ACTUAL = cliente_id
     return {"message": f"Cliente activo actualizado a {cliente_id}"}
 
-
 @app.on_event("startup")
 async def start_background_tasks():
     asyncio.create_task(actualizar_metricas_cliente())
+    iniciar_pushgateway()
 
+def iniciar_pushgateway():
+    try:
+        subprocess.Popen([
+            "docker", "run", "-d",
+            "--name", "pushgateway",
+            "-p", "9091:9091",
+            "prom/pushgateway"
+        ])
+        print("🚀 Push Gateway iniciado correctamente")
+    except Exception as e:
+        print(f"❌ Error al iniciar Push Gateway: {e}")
 
 async def actualizar_metricas_cliente():
     global CLIENTE_ACTUAL
@@ -71,18 +82,14 @@ async def actualizar_metricas_cliente():
             print(f"❌ Error actualizando métricas del cliente {CLIENTE_ACTUAL}: {e}")
         await asyncio.sleep(10)
 
-
 @app.get("/prometheus-metrics")
 def prometheus_metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
-
-# 📌 Endpoints de la API
 @app.get("/")
 def read_root():
     return {"message": "Bienvenido al Dashboard de Monitoreo"}
 
-# 📌 Configuración de logs en formato JSON
 log_dir = os.path.join(os.path.dirname(__file__), 'logs')
 os.makedirs(log_dir, exist_ok=True)
 
@@ -110,7 +117,6 @@ def log_json_error(request: Request, error: Exception):
     except Exception as log_error:
         logging.error(f"❌ ERROR al escribir en errors.json: {log_error}")
 
-# 📌 Middleware para capturar errores
 @app.middleware("http")
 async def log_exceptions(request: Request, call_next):
     print(f"🟡 Middleware activado para: {request.method} {request.url}")
@@ -123,14 +129,12 @@ async def log_exceptions(request: Request, call_next):
         log_json_error(request, e)
         raise
 
-# 📌 Manejador de excepciones global
 @app.exception_handler(Exception)
 async def custom_exception_handler(request: Request, exc: Exception):
     print(f"❌ Capturado en exception_handler: {exc}")
     log_json_error(request, exc)
     return JSONResponse(content={"detail": "Internal Server Error"}, status_code=500)
 
-# 📌 Endpoints de métricas y prueba de error
 @app.get("/metrics")
 def get_metrics():
     return {
@@ -144,7 +148,6 @@ def cause_error(request: Request):
     error = HTTPException(status_code=500, detail="Este es un error simulado para pruebas de logging")
     log_json_error(request, error)
     raise error
-
 
 class ClienteRegistro(BaseModel):
     nombre: str
@@ -181,6 +184,7 @@ def listar_clientes():
             "fecha_registro": row["fecha_registro"]
         })
     return clientes
+
 @app.get("/clientes/{cliente_id}/metrics")
 async def obtener_metrics_cliente(cliente_id: int):
     conn = get_db_connection()
@@ -196,7 +200,7 @@ async def obtener_metrics_cliente(cliente_id: int):
     metrics_url = f"{api_url.rstrip('/')}/metrics"
 
     print(f"📡 Consultando métricas para cliente {cliente_id}")
-    print(f"🔗 URL objetivo: {metrics_url}")  # 👈 Aquí lo verás en consola
+    print(f"🔗 URL objetivo: {metrics_url}")
 
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
@@ -204,7 +208,6 @@ async def obtener_metrics_cliente(cliente_id: int):
 
         response.raise_for_status()
 
-        # Devuelve texto o JSON según el content-type
         if 'application/json' in response.headers.get('content-type', ''):
             return response.json()
         else:
@@ -215,16 +218,8 @@ async def obtener_metrics_cliente(cliente_id: int):
 
 @app.get("/logs")
 async def obtener_logs_loki(limit: int = 10, query: str = Query("error")):
-    """
-    Consulta a Loki y devuelve los logs más recientes que contengan 'error'.
-    Puedes personalizar el número de resultados con ?limit=.
-    """
     loki_url = "http://loki:3100/loki/api/v1/query_range"
-
-
-    # Consulta Loki con filtro por filename y palabra clave
     loki_query = f'{{job="errors"}} |= "{query}"'
-
 
     params = {
         "query": loki_query,
