@@ -39,7 +39,7 @@
       "gridPos": { "x": 0, "y": 10, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "http_requests_total{job=\"fastapi\"}",
+          "expr": "http_requests_total",
           "refId": "B",
           "datasource": "Prometheus"
         }
