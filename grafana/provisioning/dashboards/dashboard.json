@@ -147,6 +147,39 @@
           }
         }
       }
+    },
+    {
+  "id": 6,
+  "type": "timeseries",
+  "title": "Solicitudes HTTP por endpoint (cliente)",
+  "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
+  "targets": [
+    {
+      "expr": "http_requests_total{job=\"cliente\"}",
+      "refId": "F",
+      "datasource": "Prometheus"
     }
+  ],
+  "fieldConfig": {
+    "defaults": {
+      "unit": "short",
+      "color": { "mode": "palette-classic" },
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          { "color": "green", "value": null },
+          { "color": "orange", "value": 50 },
+          { "color": "red", "value": 100 }
+        ]
+      }
+    },
+    "overrides": []
+  },
+  "options": {
+    "legend": { "displayMode": "table", "placement": "bottom" },
+    "tooltip": { "mode": "multi" }
+  }
+}
+
   ]
 }
