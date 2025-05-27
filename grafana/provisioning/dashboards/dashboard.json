@@ -155,7 +155,7 @@
   "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
   "targets": [
     {
-      "expr": "http_requests_total{job=\"cliente\"}",
+      "expr": "http_requests_total",
       "refId": "F",
       "datasource": "Prometheus"
     }
