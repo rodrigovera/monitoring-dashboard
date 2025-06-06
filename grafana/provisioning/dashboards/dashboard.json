@@ -5,7 +5,7 @@
   "tags": ["monitoring", "fastapi", "devops"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 2,
+  "version": 3,
   "refresh": "10s",
   "editable": true,
   "panels": [
@@ -40,7 +40,7 @@
       "gridPos": { "x": 0, "y": 10, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "http_requests_total",
+          "expr": "sum by (job) (http_requests_total{job=\"cliente\"})",
           "refId": "B",
           "datasource": "Prometheus"
         }
@@ -72,7 +72,7 @@
       "gridPos": { "x": 0, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_cpu_percent",
+          "expr": "custom_cpu_percent{job=\"cliente\"}",
           "refId": "C",
           "datasource": "Prometheus"
         }
@@ -100,7 +100,7 @@
       "gridPos": { "x": 8, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_memory_percent",
+          "expr": "custom_memory_percent{job=\"cliente\"}",
           "refId": "D",
           "datasource": "Prometheus"
         }
@@ -128,7 +128,7 @@
       "gridPos": { "x": 16, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_disk_usage_percent",
+          "expr": "custom_disk_usage_percent{job=\"cliente\"}",
           "refId": "E",
           "datasource": "Prometheus"
         }
@@ -150,37 +150,36 @@
       }
     },
     {
-  "id": 6,
-  "type": "timeseries",
-  "title": "Solicitudes HTTP por endpoint (cliente)",
-  "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
-  "targets": [
-    {
-      "expr": "http_requests_total",
-      "refId": "F",
-      "datasource": "Prometheus"
-    }
-  ],
-  "fieldConfig": {
-    "defaults": {
-      "unit": "short",
-      "color": { "mode": "palette-classic" },
-      "thresholds": {
-        "mode": "absolute",
-        "steps": [
-          { "color": "green", "value": null },
-          { "color": "orange", "value": 50 },
-          { "color": "red", "value": 100 }
-        ]
+      "id": 6,
+      "type": "timeseries",
+      "title": "Solicitudes HTTP por endpoint (cliente)",
+      "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
+      "targets": [
+        {
+          "expr": "sum by (endpoint, method) (http_requests_total{job=\"cliente\"})",
+          "refId": "F",
+          "datasource": "Prometheus"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 50 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
       }
-    },
-    "overrides": []
-  },
-  "options": {
-    "legend": { "displayMode": "table", "placement": "bottom" },
-    "tooltip": { "mode": "multi" }
-  }
-}
-
+    }
   ]
 }
