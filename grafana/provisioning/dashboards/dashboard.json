@@ -5,7 +5,7 @@
   "tags": ["monitoring", "fastapi", "devops"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 3,
+  "version": 4,
   "refresh": "10s",
   "editable": true,
   "panels": [
@@ -40,7 +40,7 @@
       "gridPos": { "x": 0, "y": 10, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "sum by (job) (http_requests_total{job=\"cliente\"})",
+          "expr": "sum(http_requests_total{job=\"cliente\"})",
           "refId": "B",
           "datasource": "Prometheus"
         }
