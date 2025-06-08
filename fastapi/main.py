@@ -26,10 +26,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Métricas personalizadas que reflejan el estado del cliente
-cpu_gauge = Gauge("custom_cpu_percent", "CPU usage (%) of client")
-memory_gauge = Gauge("custom_memory_percent", "RAM usage (%) of client")
-disk_gauge = Gauge("custom_disk_usage_percent", "Disk usage (%) of client")
+# 🔹 Cambia los Gauge normales por Gauge con label "cliente"
+cpu_gauge = Gauge("custom_cpu_percent", "CPU usage (%) of client", ["cliente"])
+memory_gauge = Gauge("custom_memory_percent", "RAM usage (%) of client", ["cliente"])
+disk_gauge = Gauge("custom_disk_usage_percent", "Disk usage (%) of client", ["cliente"])
+
 
 create_clients_table()
 
@@ -74,9 +75,11 @@ async def actualizar_metricas_cliente():
                     response = await client.get(metrics_url)
                     if response.status_code == 200:
                         data = response.json()
-                        cpu_gauge.set(data.get("cpu_percent", 0))
-                        memory_gauge.set(data.get("memory_percent", 0))
-                        disk_gauge.set(data.get("disk_usage", 0))
+                        cliente_id = str(CLIENTE_ACTUAL)
+                        cpu_gauge.labels(cliente=cliente_id).set(data.get("cpu_percent", 0))
+                        memory_gauge.labels(cliente=cliente_id).set(data.get("memory_percent", 0))
+                        disk_gauge.labels(cliente=cliente_id).set(data.get("disk_usage", 0))
+
                         print(f"📈 Métricas actualizadas del cliente {CLIENTE_ACTUAL}")
         except Exception as e:
             print(f"❌ Error actualizando métricas del cliente {CLIENTE_ACTUAL}: {e}")

@@ -5,7 +5,7 @@
   "tags": ["monitoring", "fastapi", "devops"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 4,
+  "version": 5,
   "refresh": "10s",
   "editable": true,
   "panels": [
@@ -40,7 +40,7 @@
       "gridPos": { "x": 0, "y": 10, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "sum(http_requests_total{job=\"cliente\"})",
+          "expr": "sum(http_requests_total{cliente=\"3\"})",
           "refId": "B",
           "datasource": "Prometheus"
         }
@@ -72,7 +72,7 @@
       "gridPos": { "x": 0, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_cpu_percent{job=\"cliente\"}",
+          "expr": "custom_cpu_percent{cliente=\"3\"}",
           "refId": "C",
           "datasource": "Prometheus"
         }
@@ -100,7 +100,7 @@
       "gridPos": { "x": 8, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_memory_percent{job=\"cliente\"}",
+          "expr": "custom_memory_percent{cliente=\"3\"}",
           "refId": "D",
           "datasource": "Prometheus"
         }
@@ -128,7 +128,7 @@
       "gridPos": { "x": 16, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_disk_usage_percent{job=\"cliente\"}",
+          "expr": "custom_disk_usage_percent{cliente=\"3\"}",
           "refId": "E",
           "datasource": "Prometheus"
         }
@@ -156,7 +156,7 @@
       "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "sum by (endpoint, method) (http_requests_total{job=\"cliente\"})",
+          "expr": "sum by (endpoint, method) (http_requests_total{cliente=\"3\"})",
           "refId": "F",
           "datasource": "Prometheus"
         }
