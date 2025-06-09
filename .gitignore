@@ -1,9 +1,6 @@
-# Logs
-logs/
-*.log
-*.json
-
-# Python
+# ========================
+# 🔹 Python / FastAPI
+# ========================
 __pycache__/
 *.py[cod]
 *.pyo
@@ -13,34 +10,58 @@ env/
 venv/
 *.env
 
-# VSCode / IDEs
-.vscode/
-.idea/
+# ========================
+# 🔹 Base de datos
+# ========================
+fastapi/monitoring.db
+*.sqlite3
+*.db
 
-# Docker
-**/.dockerignore
-docker-compose.override.yml
+# ========================
+# 🔹 Logs (JSON y texto)
+# ========================
+logs/
+*.log
 
-# Grafana local data
+# EXCEPCIÓN: dashboard.json y dashboards.json deben versionarse
+!grafana/provisioning/dashboards/*.json
+
+# ========================
+# 🔹 Grafana (datos runtime)
+# ========================
 grafana/data/
 grafana/grafana.db
-grafana/grafana.ini
 grafana/plugins/
+grafana/grafana.ini  # Solo si lo generas runtime o lo sobreescribes
 
-# Loki/Promtail positions
+# ========================
+# 🔹 Promtail / Loki runtime
+# ========================
 config.yml
 position.yaml
 
-# Sistema operativo
+# ========================
+# 🔹 Docker y herramientas relacionadas
+# ========================
+**/.dockerignore
+docker-compose.override.yml
+
+# ========================
+# 🔹 IDEs y editores
+# ========================
+.vscode/
+.idea/
+
+# ========================
+# 🔹 Sistema operativo
+# ========================
 .DS_Store
 Thumbs.db
 
-# Backup o archivos temporales
+# ========================
+# 🔹 Archivos temporales / backups
+# ========================
 *~
 *.bak
 *.tmp
 *.swp
-
-
-# Base de datos SQLite (no versionarla)
-fastapi/monitoring.db
