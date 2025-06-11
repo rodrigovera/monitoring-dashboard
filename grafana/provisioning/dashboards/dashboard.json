@@ -5,9 +5,35 @@
   "tags": ["monitoring", "fastapi", "devops"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 5,
+  "version": 6,
   "refresh": "10s",
   "editable": true,
+
+  "templating": {
+    "list": [
+      {
+        "name": "cliente",
+        "type": "query",
+        "datasource": "Prometheus",
+        "definition": "label_values(custom_cpu_percent, cliente)",
+        "query": {
+          "query": "label_values(custom_cpu_percent, cliente)",
+          "refId": "PromQuery"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "hide": 0,
+        "multi": false,
+        "includeAll": false,
+        "label": "Cliente",
+        "current": {
+          "text": "cliente",
+          "value": "$cliente"
+        }
+      }
+    ]
+  },
+
   "panels": [
     {
       "id": 1,
@@ -16,7 +42,7 @@
       "gridPos": { "x": 0, "y": 0, "h": 10, "w": 24 },
       "targets": [
         {
-          "expr": "{job=~\"errors|cliente\"}",
+          "expr": "{cliente=\"$cliente\"} |= \"error\"",
           "refId": "A",
           "datasource": "Loki"
         }
@@ -40,7 +66,7 @@
       "gridPos": { "x": 0, "y": 10, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "sum(http_requests_total{cliente=\"3\"})",
+          "expr": "sum(http_requests_total{cliente=\"$cliente\"})",
           "refId": "B",
           "datasource": "Prometheus"
         }
@@ -57,8 +83,7 @@
               { "color": "red", "value": 500 }
             ]
           }
-        },
-        "overrides": []
+        }
       },
       "options": {
         "legend": { "displayMode": "table", "placement": "bottom" },
@@ -72,7 +97,7 @@
       "gridPos": { "x": 0, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_cpu_percent{cliente=\"3\"}",
+          "expr": "custom_cpu_percent{cliente=\"$cliente\"}",
           "refId": "C",
           "datasource": "Prometheus"
         }
@@ -100,7 +125,7 @@
       "gridPos": { "x": 8, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_memory_percent{cliente=\"3\"}",
+          "expr": "custom_memory_percent{cliente=\"$cliente\"}",
           "refId": "D",
           "datasource": "Prometheus"
         }
@@ -128,7 +153,7 @@
       "gridPos": { "x": 16, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "custom_disk_usage_percent{cliente=\"3\"}",
+          "expr": "custom_disk_usage_percent{cliente=\"$cliente\"}",
           "refId": "E",
           "datasource": "Prometheus"
         }
@@ -156,7 +181,7 @@
       "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "sum by (endpoint, method) (http_requests_total{cliente=\"3\"})",
+          "expr": "sum by (endpoint, method) (http_requests_total{cliente=\"$cliente\"})",
           "refId": "F",
           "datasource": "Prometheus"
         }
@@ -173,8 +198,7 @@
               { "color": "red", "value": 100 }
             ]
           }
-        },
-        "overrides": []
+        }
       },
       "options": {
         "legend": { "displayMode": "table", "placement": "bottom" },
@@ -183,3 +207,4 @@
     }
   ]
 }
+

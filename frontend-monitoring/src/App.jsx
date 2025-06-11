@@ -4,11 +4,11 @@ export default function App() {
   const [clientes, setClientes] = useState([]);
   const [form, setForm] = useState({ nombre: "", email: "", api_url: "" });
   const [metricas, setMetricas] = useState({});
-  const [clienteActivo, setClienteActivo] = useState(null); // ✅ Aquí
+  const [clienteActivo, setClienteActivo] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://20.127.192.215:8000/clientes")
+    fetch("http://20.55.80.149:8000/clientes")
       .then((res) => res.json())
       .then((data) => setClientes(data));
   }, []);
@@ -19,7 +19,7 @@ export default function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://20.127.192.215:8000/clientes/register", {
+    const res = await fetch("http://20.55.80.149:8000/clientes/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export default function App() {
     });
     const data = await res.json();
     alert(data.message);
-    const updated = await fetch("http://20.127.192.215:8000/clientes");
+    const updated = await fetch("http://20.55.80.149:8000/clientes");
     setClientes(await updated.json());
     setForm({ nombre: "", email: "", api_url: "" });
   };
@@ -38,8 +38,8 @@ export default function App() {
     setMetricas({});
     try {
       const cliente = clientes.find((c) => c.id === id);
-      setClienteActivo(cliente); // ✅ Guardamos cliente localmente
-      const res = await fetch(`http://20.127.192.215:8000/clientes/${id}/metrics`);
+      setClienteActivo(cliente);
+      const res = await fetch(`http://20.55.80.149:8000/clientes/${id}/metrics`);
       if (!res.ok) throw new Error("No se pudieron obtener las métricas");
       const data = await res.json();
       setMetricas({ [id]: data });
@@ -111,12 +111,11 @@ export default function App() {
 
       {error && <p className="text-red-500 mt-4">Error: {error}</p>}
 
-      {/* ✅ Mostrar el iframe solo si hay clienteActivo */}
       {clienteActivo && (
         <div className="mt-8">
           <h3 className="text-md font-semibold mb-2">Dashboard en tiempo real:</h3>
           <iframe
-            src={`http://20.127.192.215:3000/d/fastapi-dashboard-v2/estado-del-sistema-fastapi?orgId=1&var-job=${clienteActivo.nombre.toLowerCase().replace(/\s+/g, "-")}&refresh=10s`}
+            src={`http://20.55.80.149:3000/d/fastapi-dashboard-v2/estado-del-sistema-fastapi?orgId=1&var-cliente=${clienteActivo.id}&refresh=10s`}
             width="100%"
             height="400"
             frameBorder="0"
@@ -127,3 +126,4 @@ export default function App() {
     </div>
   );
 }
+
