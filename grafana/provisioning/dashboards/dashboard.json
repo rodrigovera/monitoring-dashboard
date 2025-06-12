@@ -5,7 +5,7 @@
   "tags": ["monitoring", "fastapi", "devops"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 7,
+  "version": 8,
   "refresh": "10s",
   "editable": true,
   "templating": {
@@ -14,9 +14,9 @@
         "name": "cliente",
         "type": "query",
         "datasource": "Prometheus",
-        "definition": "label_values(cpu_percent, instance)",
+        "definition": "label_values(http_requests_total, exported_instance)",
         "query": {
-          "query": "label_values(cpu_percent, instance)",
+          "query": "label_values(http_requests_total, exported_instance)",
           "refId": "PromQuery"
         },
         "refresh": 1,
@@ -64,7 +64,7 @@
       "gridPos": { "x": 0, "y": 10, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "sum(http_requests_total{instance=\"$cliente\"})",
+          "expr": "sum(http_requests_total{exported_instance=\"$cliente\"})",
           "refId": "B",
           "datasource": "Prometheus"
         }
@@ -95,7 +95,7 @@
       "gridPos": { "x": 0, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "cpu_percent{instance=\"$cliente\"}",
+          "expr": "cpu_percent{exported_instance=\"$cliente\"}",
           "refId": "C",
           "datasource": "Prometheus"
         }
@@ -123,7 +123,7 @@
       "gridPos": { "x": 8, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "memory_percent{instance=\"$cliente\"}",
+          "expr": "memory_percent{exported_instance=\"$cliente\"}",
           "refId": "D",
           "datasource": "Prometheus"
         }
@@ -151,7 +151,7 @@
       "gridPos": { "x": 16, "y": 18, "h": 6, "w": 8 },
       "targets": [
         {
-          "expr": "disk_usage{instance=\"$cliente\"}",
+          "expr": "disk_usage{exported_instance=\"$cliente\"}",
           "refId": "E",
           "datasource": "Prometheus"
         }
@@ -179,7 +179,7 @@
       "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
       "targets": [
         {
-          "expr": "sum by (endpoint, method) (http_requests_total{instance=\"$cliente\"})",
+          "expr": "sum by (endpoint, method) (http_requests_total{exported_instance=\"$cliente\"})",
           "refId": "F",
           "datasource": "Prometheus"
         }
