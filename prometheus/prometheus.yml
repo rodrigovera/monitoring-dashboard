@@ -19,4 +19,4 @@ scrape_configs:
 
   - job_name: 'pushgateway'
     static_configs:
-      - targets: ['20.127.192.215:9091']
+      - targets: ['20.55.80.149:9091']
