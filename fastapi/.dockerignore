@@ -1,9 +1,32 @@
+# 🔹 Entornos virtuales de Python
 venv/
+env/
+
+# 🔹 Archivos de caché de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# 🔹 Base de datos local (evita copiarla dentro de la imagen)
 *.db
 *.sqlite3
-logs/
 
+# 🔹 Archivos de logs
+logs/
+*.log
+
+# 🔹 Archivos de configuración o datos temporales
+*.bak
+*.tmp
+*.swp
+
+# 🔹 Archivos ocultos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# 🔹 Archivos que no deben ir a la imagen
+docker-compose.yml
+.dockerignore
+.git/
+.gitignore
