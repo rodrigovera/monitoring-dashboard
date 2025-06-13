@@ -2,7 +2,11 @@
   "id": null,
   "uid": "fastapi-dashboard-v2",
   "title": "Estado del sistema FastAPI",
-  "tags": ["monitoring", "fastapi", "devops"],
+  "tags": [
+    "monitoring",
+    "fastapi",
+    "devops"
+  ],
   "timezone": "browser",
   "schemaVersion": 37,
   "version": 8,
@@ -11,23 +15,35 @@
   "templating": {
     "list": [
       {
-        "name": "cliente",
+        "name": "job",
         "type": "query",
         "datasource": "Prometheus",
-        "definition": "label_values(http_requests_total, exported_instance)",
+        "definition": "label_values(http_requests_total, job)",
         "query": {
-          "query": "label_values(http_requests_total, exported_instance)",
-          "refId": "PromQuery"
+          "query": "label_values(http_requests_total, job)",
+          "refId": "JobQuery"
         },
         "refresh": 1,
-        "sort": 1,
-        "hide": 0,
-        "multi": false,
-        "includeAll": false,
         "label": "Cliente",
         "current": {
-          "text": "cliente",
-          "value": "$cliente"
+          "text": "Seleccionar",
+          "value": "$job"
+        }
+      },
+      {
+        "name": "instance",
+        "type": "query",
+        "datasource": "Prometheus",
+        "definition": "label_values(http_requests_total{job=\"$job\"}, instance)",
+        "query": {
+          "query": "label_values(http_requests_total{job=\"$job\"}, instance)",
+          "refId": "InstQuery"
+        },
+        "refresh": 1,
+        "label": "Instancia",
+        "current": {
+          "text": "Seleccionar",
+          "value": "$instance"
         }
       }
     ]
@@ -37,7 +53,12 @@
       "id": 1,
       "type": "logs",
       "title": "Logs de errores (Loki)",
-      "gridPos": { "x": 0, "y": 0, "h": 10, "w": 24 },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "h": 10,
+        "w": 24
+      },
       "targets": [
         {
           "expr": "{job=\"cliente\"} |= \"error\"",
@@ -61,10 +82,15 @@
       "id": 2,
       "type": "timeseries",
       "title": "Total de peticiones HTTP",
-      "gridPos": { "x": 0, "y": 10, "h": 8, "w": 24 },
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "h": 8,
+        "w": 24
+      },
       "targets": [
         {
-          "expr": "sum(http_requests_total{exported_instance=\"$cliente\"})",
+          "expr": "sum(http_requests_total{job=\"$job\", instance=\"$instance\"})",
           "refId": "B",
           "datasource": "Prometheus"
         }
@@ -72,30 +98,51 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 100 },
-              { "color": "red", "value": 500 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
             ]
           }
         }
       },
       "options": {
-        "legend": { "displayMode": "table", "placement": "bottom" },
-        "tooltip": { "mode": "single" }
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       }
     },
     {
       "id": 3,
       "type": "gauge",
       "title": "Uso de CPU (%)",
-      "gridPos": { "x": 0, "y": 18, "h": 6, "w": 8 },
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "h": 6,
+        "w": 8
+      },
       "targets": [
         {
-          "expr": "cpu_percent{exported_instance=\"$cliente\"}",
+          "expr": "cpu_percent{job=\"$job\", instance=\"$instance\"}",
           "refId": "C",
           "datasource": "Prometheus"
         }
@@ -108,9 +155,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 70 },
-              { "color": "red", "value": 90 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
             ]
           }
         }
@@ -120,10 +176,15 @@
       "id": 4,
       "type": "gauge",
       "title": "Uso de RAM (%)",
-      "gridPos": { "x": 8, "y": 18, "h": 6, "w": 8 },
+      "gridPos": {
+        "x": 8,
+        "y": 18,
+        "h": 6,
+        "w": 8
+      },
       "targets": [
         {
-          "expr": "memory_percent{exported_instance=\"$cliente\"}",
+          "expr": "memory_percent{job=\"$job\", instance=\"$instance\"}",
           "refId": "D",
           "datasource": "Prometheus"
         }
@@ -136,9 +197,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 80 },
-              { "color": "red", "value": 90 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
             ]
           }
         }
@@ -148,10 +218,15 @@
       "id": 5,
       "type": "gauge",
       "title": "Uso de Disco (%)",
-      "gridPos": { "x": 16, "y": 18, "h": 6, "w": 8 },
+      "gridPos": {
+        "x": 16,
+        "y": 18,
+        "h": 6,
+        "w": 8
+      },
       "targets": [
         {
-          "expr": "disk_usage{exported_instance=\"$cliente\"}",
+          "expr": "disk_usage{job=\"$job\", instance=\"$instance\"}",
           "refId": "E",
           "datasource": "Prometheus"
         }
@@ -164,9 +239,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 80 },
-              { "color": "red", "value": 90 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
             ]
           }
         }
@@ -176,10 +260,15 @@
       "id": 6,
       "type": "timeseries",
       "title": "Solicitudes HTTP por endpoint (cliente)",
-      "gridPos": { "x": 0, "y": 24, "h": 8, "w": 24 },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "h": 8,
+        "w": 24
+      },
       "targets": [
         {
-          "expr": "sum by (endpoint, method) (http_requests_total{exported_instance=\"$cliente\"})",
+          "expr": "sum by (endpoint, method) (http_requests_total{job=\"$job\", instance=\"$instance\"})",
           "refId": "F",
           "datasource": "Prometheus"
         }
@@ -187,20 +276,36 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 50 },
-              { "color": "red", "value": 100 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
             ]
           }
         }
       },
       "options": {
-        "legend": { "displayMode": "table", "placement": "bottom" },
-        "tooltip": { "mode": "multi" }
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
       }
     }
   ]
