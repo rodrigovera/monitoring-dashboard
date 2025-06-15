@@ -65,3 +65,6 @@ Thumbs.db
 *.bak
 *.tmp
 *.swp
+node_modules/
+.env
+dist/
