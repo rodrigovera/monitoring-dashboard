@@ -5,7 +5,7 @@
   "tags": ["monitoring", "fastapi", "devops"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 9,
+  "version": 10,
   "refresh": "10s",
   "editable": true,
   "templating": {
@@ -14,9 +14,9 @@
         "name": "cliente",
         "type": "query",
         "datasource": "Prometheus",
-        "definition": "label_values(cpu_percent, job)",
+        "definition": "label_values(cpu_percent, exported_job)",
         "query": {
-          "query": "label_values(cpu_percent, job)",
+          "query": "label_values(cpu_percent, exported_job)",
           "refId": "ClienteQuery"
         },
         "refresh": 1,
@@ -60,7 +60,7 @@
       "gridPos": {"x": 0, "y": 10, "h": 8, "w": 24},
       "targets": [
         {
-          "expr": "sum(http_requests_total{job=\"$cliente\"})",
+          "expr": "sum(http_requests_total{exported_job=\"$cliente\"})",
           "refId": "B",
           "datasource": "Prometheus"
         }
@@ -85,13 +85,97 @@
       }
     },
     {
+      "id": 3,
+      "type": "gauge",
+      "title": "Uso de CPU (%)",
+      "gridPos": {"x": 0, "y": 18, "h": 6, "w": 8},
+      "targets": [
+        {
+          "expr": "cpu_percent{exported_job=\"$cliente\"}",
+          "refId": "C",
+          "datasource": "Prometheus"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "orange", "value": 70},
+              {"color": "red", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "gauge",
+      "title": "Uso de RAM (%)",
+      "gridPos": {"x": 8, "y": 18, "h": 6, "w": 8},
+      "targets": [
+        {
+          "expr": "memory_percent{exported_job=\"$cliente\"}",
+          "refId": "D",
+          "datasource": "Prometheus"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "orange", "value": 80},
+              {"color": "red", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "gauge",
+      "title": "Uso de Disco (%)",
+      "gridPos": {"x": 16, "y": 18, "h": 6, "w": 8},
+      "targets": [
+        {
+          "expr": "disk_usage{exported_job=\"$cliente\"}",
+          "refId": "E",
+          "datasource": "Prometheus"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "orange", "value": 80},
+              {"color": "red", "value": 90}
+            ]
+          }
+        }
+      }
+    },
+    {
       "id": 6,
       "type": "timeseries",
       "title": "Solicitudes HTTP por endpoint (cliente)",
       "gridPos": {"x": 0, "y": 24, "h": 8, "w": 24},
       "targets": [
         {
-          "expr": "sum by (endpoint, method) (http_requests_total{job=\"$cliente\"})",
+          "expr": "sum by (endpoint, method) (http_requests_total{exported_job=\"$cliente\"})",
           "refId": "F",
           "datasource": "Prometheus"
         }
